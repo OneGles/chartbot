@@ -64,4 +64,18 @@ class UserProfile(BaseModel):
             self.dislikes_by_domain.setdefault(domain, [])
             self.dislikes_by_domain[domain] = add_unique(self.dislikes_by_domain[domain], vals)
 
+        # Defensive cleanup: seed titles must not appear in domain preference lists
+        seed_set = {norm(x).lower() for x in self.seeds}
+
+        for domain, vals in list(self.likes_by_domain.items()):
+            self.likes_by_domain[domain] = [
+                v for v in vals if norm(v).lower() not in seed_set
+            ]
+
+        for domain, vals in list(self.dislikes_by_domain.items()):
+            self.dislikes_by_domain[domain] = [
+                v for v in vals if norm(v).lower() not in seed_set
+            ]
+
+
         return self

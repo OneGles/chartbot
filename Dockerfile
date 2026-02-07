@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Codice
-COPY app ./app
+COPY . .
 COPY scripts ./scripts
 RUN mkdir -p /app/data
 
@@ -28,3 +28,5 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 #docker compose up discord-bot / upload-audio
 #@tasks.loop(time=time(hour=21, minute=31, second=0, tzinfo=TZ))
 #https://platform.openai.com/chat
+#docker compose exec api python -m scripts.load_items
+
