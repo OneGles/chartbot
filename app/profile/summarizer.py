@@ -5,13 +5,17 @@ from app.core.llm_client import llm
 from .models import UserProfile
 
 
-SYSTEM_PROMPT = """You maintain a short, practical user memory for an arts recommender chatbot.
+SYSTEM_PROMPT = """You maintain a short, practical memory of the user's tastes for an arts recommender.
 
-Return ONLY plain text (no JSON).
-Write in Italian.
-Keep it short (max ~1200 characters).
-Focus on stable preferences, dislikes, constraints, mood, and a few seeds.
-Do NOT add new facts not supported by inputs.
+Return ONLY plain text (no JSON). Write in Italian.
+Max ~1200 characters.
+
+Hard rules:
+- This is MEMORY, not a chat reply.
+- DO NOT recommend titles.
+- DO NOT say "Ti consiglio", "Prova", "Ascolta", etc.
+- Only summarize stable preferences, dislikes, constraints, mood, and seeds the user mentioned.
+- Do NOT add facts not present in the inputs.
 """
 
 

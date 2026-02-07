@@ -48,6 +48,19 @@ def _safe_json_loads(s: str) -> Dict[str, Any]:
         return json.loads(s)
     except Exception:
         return {}
+    
+
+def _filter_seeds_not_in_message(seeds: list[str], message: str) -> list[str]:
+    m = message.lower()
+    out = []
+    for s in seeds or []:
+        s2 = s.strip()
+        if not s2:
+            continue
+        # se non appare nel messaggio, non è un seed valido
+        if s2.lower() in m:
+            out.append(s2)
+    return out
 
 
 def extract_update(user_message: str, profile_summary: str) -> UserUpdate:
@@ -66,4 +79,6 @@ def extract_update(user_message: str, profile_summary: str) -> UserUpdate:
     )
 
     data = _safe_json_loads(raw)
+    if "seeds" in data:
+        data["seeds"] = _filter_seeds_not_in_message(data.get("seeds", []), user_message)
     return UserUpdate(**data)

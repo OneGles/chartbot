@@ -76,13 +76,30 @@ def _apply_constraints(results: List[Dict[str, Any]], profile: UserProfile, doma
     out.sort(key=lambda x: x.get("score", 0.0), reverse=True)
     return out
 
+def _filter_seeds(candidates: List[Dict[str, Any]], profile: UserProfile) -> List[Dict[str, Any]]:
+    seed_set = {_norm(s) for s in profile.seeds}
+    out = []
+    for c in candidates:
+        title = _norm(c.get("title", ""))
+        if title and title in seed_set:
+            continue
+        out.append(c)
+    return out
 
 def recommend_bundle(profile: UserProfile, top_k_per_domain: int = 8) -> Dict[str, Any]:
     per_domain: Dict[str, List[Dict[str, Any]]] = {}
     for domain in DOMAINS:
         q = _build_query(profile, domain) or "popular"
         candidates = vector_search(domain, q, top_k=top_k_per_domain)
+        candidates = _filter_seeds(candidates, profile)
         candidates = _apply_constraints(candidates, profile, domain)
+
+        if not candidates:
+            # fallback: query più generica ma sempre filtrando seeds
+            candidates = vector_search(domain, "popular " + domain, top_k=top_k_per_domain)
+            candidates = _filter_seeds(candidates, profile)
+            candidates = _apply_constraints(candidates, profile, domain)
+            
         per_domain[domain] = candidates
 
     bundle: Dict[str, Any] = {}

@@ -6,6 +6,7 @@ from app.profile.extractor import extract_update
 from app.profile.summarizer import update_summary
 from app.retrieval.search import search as vector_search
 from app.ranking.ranker import recommend_bundle
+from app.ranking.explainer import explain
 
 router = APIRouter()
 
@@ -25,6 +26,8 @@ def chat(req: ChatRequest):
     summary = update_summary(summary, req.message, profile)
     save_user_profile_and_summary(req.user_id, profile, summary)
     rec = recommend_bundle(profile)
+    bundle = rec["bundle"]
+    explained = explain(summary, profile.constraints, bundle)
 
     # Per ora: “assistant_message” minimale, poi lo sostituiremo con output RAG
     assistant_message = (
@@ -39,6 +42,7 @@ def chat(req: ChatRequest):
         "profile": profile.model_dump(),
         "summary": summary,
         "recommendations": rec,
+        "final": explained,
     }
 
 
