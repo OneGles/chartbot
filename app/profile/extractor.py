@@ -30,6 +30,7 @@ Hard rules:
 - "constraints" contains negations like "no gore", "only Italian", "short games".
 - Do NOT duplicate: if something is a seed title, do not repeat it in likes_by_domain.
 - If uncertain, leave fields empty.
+- Prefer Italian labels for genres/tags (e.g., "psicologico" instead of "psychological").
 """
 
 
