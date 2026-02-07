@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.profile.store import get_user_profile_and_summary, save_user_profile_and_summary
 from app.profile.extractor import extract_update
 from app.profile.summarizer import update_summary
+from app.retrieval.search import search as vector_search
 
 router = APIRouter()
 
@@ -36,3 +37,17 @@ def chat(req: ChatRequest):
         "profile": profile.model_dump(),
         "summary": summary,
     }
+
+
+class SearchRequest(BaseModel):
+    domain: str
+    query: str
+    top_k: int = 5
+
+@router.post("/search")
+def search_endpoint(req: SearchRequest):
+    return {
+        "domain": req.domain,
+        "query": req.query,
+        "results": vector_search(req.domain, req.query, req.top_k),
+}
