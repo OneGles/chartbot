@@ -7,6 +7,7 @@ from app.profile.summarizer import update_summary
 from app.retrieval.search import search as vector_search
 from app.ranking.ranker import recommend_bundle
 from app.ranking.explainer import explain
+from app.feedback.store import add_event
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ def chat(req: ChatRequest):
 
     summary = update_summary(summary, req.message, profile)
     save_user_profile_and_summary(req.user_id, profile, summary)
-    rec = recommend_bundle(profile)
+    rec = recommend_bundle(profile, req.user_id)
     bundle = rec["bundle"]
     explained = explain(summary, profile.constraints, bundle)
 
@@ -44,6 +45,17 @@ def chat(req: ChatRequest):
         "recommendations": rec,
         "final": explained,
     }
+
+
+class FeedbackRequest(BaseModel):
+    user_id: int
+    item_id: int
+    action: str  # like|dislike
+
+@router.post("/feedback")
+def feedback(req: FeedbackRequest):
+    add_event(req.user_id, req.item_id, req.action)
+    return {"status": "ok"}
 
 
 class SearchRequest(BaseModel):
