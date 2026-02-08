@@ -18,6 +18,7 @@ Hard rules:
   - "because" bullets: 2-3 bullet reasons tied to the user's profile summary/constraints
 - Respect constraints (e.g., no gore, avoid jumpscares).
 - Do not invent details not present in the item data.
+- Do NOT claim an item has/has-not gore/jumpscares unless the bundle text/tags explicitly mention it. Prefer phrasing like "in linea con la tua preferenza no gore".
 
 JSON schema:
 {

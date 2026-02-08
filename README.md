@@ -20,32 +20,6 @@ docker compose exec api python -m scripts.build_index
 }
 
 
-A) Normalizzazione profilo (qualità)
-
-dedup intelligente, mapping IT/EN per tag comuni
-
-canonicalizzazione constraints
-
-B) Feedback loop (events)
-
-endpoint /feedback (like/dislike su item)
-
-salva su tabella events
-
-usa feedback per bias nel ranking (boost/penalty per tag/people)
-
-C) API di raccomandazione “pulita”
-
-endpoint /recommend che non aggiorna profilo, ma genera solo consigli
-
-/chat resta per aggiornare profilo
-
-D) “Session memory” corretta
-
-summary solo gusto (già quasi ok)
-
-niente contaminazioni
-
 E) Demo/portfolio
 
 README con architettura + screenshot
@@ -55,3 +29,8 @@ script make demo (o powershell) per: init db, load items, build index, run
 (opzionale) UI minimale (React/Next o anche solo una pagina HTML)
 
 Se fai A+B+C+D sei già “portfolio ready”. La UI è extra.
+
+docker compose exec api sh -lc "sqlite3 data/app.db 'DELETE FROM events WHERE user_id=1;'"
+docker compose exec api sh -lc "sqlite3 data/app.db 'DELETE FROM users WHERE id=1;'"
+docker compose exec api sh -m scripts.generate_items
+
