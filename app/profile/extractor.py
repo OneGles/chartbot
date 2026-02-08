@@ -39,7 +39,7 @@ def _safe_json_loads(s: str) -> Dict[str, Any]:
     Best-effort parse: tries to locate the first JSON object in the string.
     """
     s = s.strip()
-    # If model returns extra text, try to slice to the outermost braces
+    # Controllo se il modello restituisce testo extra
     if not s.startswith("{"):
         start = s.find("{")
         end = s.rfind("}")
@@ -67,7 +67,7 @@ def _filter_seeds_not_in_message(seeds: list[str], message: str) -> list[str]:
 def extract_update(user_message: str, profile_summary: str) -> UserUpdate:
     user_payload = {
         "message": user_message,
-        "known_profile_summary": profile_summary[:1500],  # keep bounded
+        "known_profile_summary": profile_summary[:1500],
     }
 
     raw = llm.chat(

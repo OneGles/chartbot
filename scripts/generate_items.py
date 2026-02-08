@@ -10,7 +10,7 @@ SEED = 42
 
 DOMAINS = ["film", "book", "music", "game"]
 
-# Palette generi/toni: vario, non solo dark
+# Palette generi/toni differenti
 GENRES = {
     "film": [
         ("thriller", ["thriller", "mystery", "twist"]),
@@ -147,7 +147,7 @@ HOOKS = {
 }
 
 def make_title(domain: str, genre: str, idx: int) -> str:
-    # titoli unici, neutri, non IP reali
+    # non IP reali
     prefixes = {
         "film": ["Echo", "Mirror", "City", "Signal", "Drift", "Lighthouse", "Paper", "Gravity"],
         "book": ["The", "A", "Beyond", "Under", "Between", "After", "Before", "Inside"],

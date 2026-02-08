@@ -8,7 +8,7 @@ from app.retrieval.embeddings import embed_texts
 
 
 def _cosine(a: List[float], b: List[float]) -> float:
-    # defensive: different sizes => no match
+    # defensive: dimensioni differenti => non corrisponde
     if not a or not b or len(a) != len(b):
         return -1.0
     dot = 0.0
@@ -60,7 +60,7 @@ def search(domain: str, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     # 1) embed query
     q_emb = embed_texts([query])[0]
 
-    # 2) fetch all embeddings for domain
+    # 2) fetch tutti gli embeddings dal dominio
     rows = _fetch_domain_chunks(domain)
 
     scored: List[Tuple[float, int]] = []
@@ -75,7 +75,7 @@ def search(domain: str, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     scored.sort(key=lambda x: x[0], reverse=True)
     top = scored[: max(1, top_k)]
 
-    # 3) hydrate metadata
+    # 3) Aggiorna metadata
     results: List[Dict[str, Any]] = []
     for sim, item_id in top:
         meta = _get_item_metadata(item_id)

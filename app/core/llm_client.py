@@ -23,7 +23,7 @@ class LLMClient:
             timeout=60,
         )
 
-        # Se OpenAI risponde con errore, il body contiene "error" e non "choices"
+        # Se OpenAI risponde con errore, il body contiene "error" 
         if resp.status_code >= 400:
             raise RuntimeError(f"LLM HTTP {resp.status_code}: {resp.text}")
 

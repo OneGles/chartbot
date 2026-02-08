@@ -82,12 +82,11 @@ class UserProfile(BaseModel):
         self.constraints = add_unique(self.constraints, upd.constraints)
         self.mood = add_unique(self.mood, upd.mood)
 
-        # Canonicalize constraints after merge (so we unify variants)
+        # Unificazione varianti
         self.constraints = [canon_no(x) for x in self.constraints]
-        # Dedup again after canonicalization
         self.constraints = add_unique([], self.constraints)
 
-        # Merge domain dicts
+        # Merge domini
         for domain, vals in (upd.likes_by_domain or {}).items():
             self.likes_by_domain.setdefault(domain, [])
             self.likes_by_domain[domain] = add_unique(self.likes_by_domain[domain], vals)
@@ -96,7 +95,7 @@ class UserProfile(BaseModel):
             self.dislikes_by_domain.setdefault(domain, [])
             self.dislikes_by_domain[domain] = add_unique(self.dislikes_by_domain[domain], vals)
 
-        # Defensive cleanup: seed titles must not appear in domain preference lists
+        # Defensive cleanup: i titoli seed non devono apparire nella lista preferenze del dominio 
         seed_set = {norm(x).lower() for x in self.seeds}
         for domain, vals in list(self.likes_by_domain.items()):
             self.likes_by_domain[domain] = [v for v in vals if norm(v).lower() not in seed_set]

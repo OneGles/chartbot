@@ -34,7 +34,7 @@ def update_summary(old_summary: str, new_message: str, profile: UserProfile) -> 
         temperature=0.2,
     ).strip()
 
-    # Hard clamp (defensive)
+    # Hard clamp
     if len(text) > 1200:
         text = text[:1200].rsplit(" ", 1)[0]
     return text

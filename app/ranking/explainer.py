@@ -61,7 +61,7 @@ def explain(profile_summary: str, constraints: list[str], bundle: Dict[str, Any]
     try:
         return json.loads(raw)
     except Exception:
-        # fallback minimale: niente LLM
+        # fallback minimale
         return {
             "message": "Ecco alcuni consigli coerenti con le tue preferenze.",
             "by_domain": {

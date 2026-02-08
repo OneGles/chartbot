@@ -62,7 +62,6 @@ def _apply_constraints(results: List[Dict[str, Any]], profile: UserProfile, doma
     banned: List[str] = []
     if "no gore" in c or "gore" in c:
         banned.append("gore")
-    # dopo Step 7, la forma canonica è "no jumpscare ..." quindi basta questo check
     if "jumpscare" in c:
         banned.append("jumpscare")
 
@@ -172,7 +171,7 @@ def _apply_feedback_bias(
         score += 0.05 * len(tags & liked_tags)
         score += 0.08 * len(people & liked_people)
 
-        # penalty
+        # penalità
         score -= 0.05 * len(tags & disliked_tags)
         score -= 0.08 * len(people & disliked_people)
 

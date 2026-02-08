@@ -27,9 +27,8 @@ def chat(req: ChatRequest):
     summary = update_summary(summary, req.message, profile)
     save_user_profile_and_summary(req.user_id, profile, summary)
 
-    # Per ora: “assistant_message” minimale, poi lo sostituiremo con output RAG
     assistant_message = (
-        "Ok. Ho aggiornato le tue preferenze. Quando vuoi posso consigliarti "
+        "Ho aggiornato le tue preferenze. Quando vuoi posso consigliarti "
         "1 film, 1 libro, 1 musica e 1 videogioco coerenti con il tuo gusto."
     )
 
@@ -71,17 +70,3 @@ class FeedbackRequest(BaseModel):
 def feedback(req: FeedbackRequest):
     add_event(req.user_id, req.item_id, req.action)
     return {"status": "ok"}
-
-
-class SearchRequest(BaseModel):
-    domain: str
-    query: str
-    top_k: int = 5
-
-@router.post("/search")
-def search_endpoint(req: SearchRequest):
-    return {
-        "domain": req.domain,
-        "query": req.query,
-        "results": vector_search(req.domain, req.query, req.top_k),
-}

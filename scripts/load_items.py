@@ -98,7 +98,6 @@ def main():
                 )
                 inserted += 1
             except Exception:
-                # most likely unique constraint hit
                 skipped += 1
 
         conn.commit()
