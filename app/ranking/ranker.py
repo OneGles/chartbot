@@ -64,6 +64,8 @@ def _apply_constraints(results: List[Dict[str, Any]], profile: UserProfile, doma
         banned.append("gore")
     if "jumpscare" in c:
         banned.append("jumpscare")
+    if "no horror" in c or "niente horror" in c or "non mi piace" in c and "horror" in c or "horror" in c and ("no " in c or "niente " in c):
+        banned.append("horror")
 
     out: List[Dict[str, Any]] = []
     for r in results:

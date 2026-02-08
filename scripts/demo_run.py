@@ -89,15 +89,15 @@ def main() -> None:
 
     r_chat1 = post_json(
         "/chat",
-        {"user_id": 1, "message": "Non mi piacciono gli horror in nessun field artistico."},
+        {"user_id": 1, "message": "Mi piacciono i thriller psicologici tipo Shutter Island. Niente gore."},
     )
     r_chat2 = post_json(
         "/chat",
-        {"user_id": 1, "message": "Mi piacciono i film di animazione di qualsiasi genere"},
+        {"user_id": 1, "message": "In musica: dark ambient e colonne sonore tese, atmosfera cupa."},
     )
     r_chat3 = post_json(
         "/chat",
-        {"user_id": 1, "message": "Mi piacciono i videogiochi d'azione."},
+        {"user_id": 1, "message": "Nei videogiochi: horror narrativo e psicologico. No jumpscare continui."},
     )
 
     summary = r_chat3.get("summary", "")
