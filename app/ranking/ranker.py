@@ -11,6 +11,15 @@ from app.retrieval.search import search as vector_search
 
 DOMAINS = ["film", "book", "music", "game"]
 
+ITEM_TAG_CANON = {
+  "psychological": "psicologico",
+  "thriller": "thriller",
+  "horror": "horror",
+  "dark": "cupo",
+  "atmospheric": "atmosferico",
+  "twist": "colpo di scena",
+}
+
 
 def _softmax(scores: List[float], temperature: float = 1.0) -> List[float]:
     if not scores:
@@ -87,24 +96,51 @@ def _filter_seeds(candidates: List[Dict[str, Any]], profile: UserProfile) -> Lis
 
 
 def _fetch_items_meta(item_ids: List[int]) -> List[Dict[str, Any]]:
+    """
+    Returns list of dicts with: {"domain": str, "tags": [...], "people": [...]}
+    """
     if not item_ids:
         return []
     qmarks = ",".join(["?"] * len(item_ids))
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(
-            f"SELECT metadata_json FROM items WHERE id IN ({qmarks})",
+            f"SELECT domain, metadata_json FROM items WHERE id IN ({qmarks})",
             item_ids,
         )
         rows = cur.fetchall()
 
     out: List[Dict[str, Any]] = []
-    for (mj,) in rows:
+    for domain, mj in rows:
         try:
-            out.append(json.loads(mj) if mj else {})
+            meta = json.loads(mj) if mj else {}
         except Exception:
-            out.append({})
+            meta = {}
+        meta["domain"] = domain
+        out.append(meta)
     return out
+
+
+def _extract_pref_by_domain(meta_list: List[Dict[str, Any]]) -> Tuple[Dict[str, set[str]], Dict[str, set[str]]]:
+    tags_by_domain: Dict[str, set[str]] = {}
+    people_by_domain: Dict[str, set[str]] = {}
+
+    for m in meta_list:
+        domain = m.get("domain")
+        if not domain:
+            continue
+
+        tags_by_domain.setdefault(domain, set())
+        people_by_domain.setdefault(domain, set())
+
+        for t in (m.get("tags") or []):
+            tags_by_domain[domain].add(_norm(t))
+        for p in (m.get("people") or []):
+            people_by_domain[domain].add(_norm(p))
+
+    return tags_by_domain, people_by_domain
+
+
 
 
 def _extract_pref(meta_list: List[Dict[str, Any]]) -> Tuple[set[str], set[str]]:
@@ -154,12 +190,17 @@ def recommend_bundle(profile: UserProfile, user_id: int, top_k_per_domain: int =
     liked_meta = _fetch_items_meta(liked_ids)
     disliked_meta = _fetch_items_meta(disliked_ids)
 
-    liked_tags, liked_people = _extract_pref(liked_meta)
-    disliked_tags, disliked_people = _extract_pref(disliked_meta)
+    liked_tags_by_domain, liked_people_by_domain = _extract_pref_by_domain(liked_meta)
+    disliked_tags_by_domain, disliked_people_by_domain = _extract_pref_by_domain(disliked_meta)
 
     per_domain: Dict[str, List[Dict[str, Any]]] = {}
     for domain in DOMAINS:
         q = _build_query(profile, domain) or "popular"
+
+        liked_tags = liked_tags_by_domain.get(domain, set())
+        liked_people = liked_people_by_domain.get(domain, set())
+        disliked_tags = disliked_tags_by_domain.get(domain, set())
+        disliked_people = disliked_people_by_domain.get(domain, set())
 
         candidates = vector_search(domain, q, top_k=top_k_per_domain)
         candidates = _filter_seeds(candidates, profile)
@@ -201,7 +242,9 @@ def recommend_bundle(profile: UserProfile, user_id: int, top_k_per_domain: int =
 
 def _collect_reason_tags(profile: UserProfile, item: Dict[str, Any], domain: str) -> List[str]:
     wants = [_norm(x) for x in (profile.likes_by_domain.get(domain, []) + profile.mood)]
-    tags = [_norm(x) for x in (item.get("tags") or [])]
+    raw_tags = item.get("tags") or []
+    tags = [_norm(ITEM_TAG_CANON.get(_norm(x), _norm(x))) for x in raw_tags]
+
 
     overlap: List[str] = []
     for w in wants:

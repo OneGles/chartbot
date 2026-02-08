@@ -26,9 +26,6 @@ def chat(req: ChatRequest):
 
     summary = update_summary(summary, req.message, profile)
     save_user_profile_and_summary(req.user_id, profile, summary)
-    rec = recommend_bundle(profile, req.user_id)
-    bundle = rec["bundle"]
-    explained = explain(summary, profile.constraints, bundle)
 
     # Per ora: “assistant_message” minimale, poi lo sostituiremo con output RAG
     assistant_message = (
@@ -40,6 +37,24 @@ def chat(req: ChatRequest):
         "status": "ok",
         "assistant_message": assistant_message,
         "update": upd.model_dump(),
+        "profile": profile.model_dump(),
+        "summary": summary,
+    }
+
+
+class RecommendRequest(BaseModel):
+    user_id: int
+    top_k_per_domain: int = 8
+
+@router.post("/recommend")
+def recommend(req: RecommendRequest):
+    profile, summary = get_user_profile_and_summary(req.user_id)
+
+    rec = recommend_bundle(profile, req.user_id, top_k_per_domain=req.top_k_per_domain)
+    explained = explain(summary, profile.constraints, rec["bundle"])
+
+    return {
+        "status": "ok",
         "profile": profile.model_dump(),
         "summary": summary,
         "recommendations": rec,
