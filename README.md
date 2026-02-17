@@ -107,7 +107,7 @@ Esegue automaticamente:
 - Inserimento "dislike" al film precedente
 - Terza richiesta /recommend
 
-Se si vogliono cambiare le preferenze iniziali in demo_run, modificarle direttamente dallo script e rifare la build e l'avvio di Docker.
+Se si vuole cambiare le preferenze iniziali in demo_run, modificarle direttamente dallo script e rifare la build e l'avvio di Docker.
 In caso si volesse testare direttamente su fastAPI (anche per vedere TUTTI i dati nella struttura json) senza usare gli script di demo, andare su http://localhost:8000/docs e nella sezione di flusso dati di questo file per capire come scrivere la pipeline corretta per ogni endpoint.
 
 
